@@ -45,7 +45,7 @@ Heat map charts use [two-dimensional kernel density estimation](https://en.wikip
 
 Anecdotally I've found that heat maps often show, unsurprisingly, that most shot attempts are taken in the restricted area near the basket. It might be more interesting to filter out restricted area shots when generating heat maps, for example here's the heat map of Stephen Curry's shot attempts *excluding* shots from within the restricted area:
 
-![heat map excluding restricted area](https://cloud.githubusercontent.com/assets/70271/13382185/0e3fce5a-de3c-11e5-93a7-e8a807dfbf83.png)
+![heat map excluding restricted area](https://cloud.githubusercontent.com/assets/70271/13588733/23896d06-e4a0-11e5-887e-f31c636de422.png)
 
 ### Filters
 
