@@ -11,6 +11,10 @@ players = mutate(players,
   team_id = as.numeric(team_id)
 )
 
+if (Sys.Date() <= as.Date("2016-10-25")) {
+  players = mutate(players, to_year = pmin(to_year, 2015))
+}
+
 players$name = sapply(players$display_last_comma_first, function(s) {
   paste(rev(strsplit(s, ", ")[[1]]), collapse = " ")
 })
