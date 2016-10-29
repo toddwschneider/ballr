@@ -5,6 +5,7 @@ fetch_shots_by_player_id_and_season = function(player_id, season) {
     "http://stats.nba.com/stats/shotchartdetail",
     query = list(
       PlayerID = player_id,
+      PlayerPosition = "",
       Season = season,
       ContextMeasure = "FGA",
       DateFrom = "",
