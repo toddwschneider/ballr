@@ -27,7 +27,7 @@ fetch_shots_by_player_id_and_season = function(player_id, season) {
       VsConference = "",
       VsDivision = ""
     ),
-    user_agent(mac_safari)
+    add_headers(request_headers)
   )
 
   stop_for_status(request)
