@@ -19,14 +19,14 @@ names(players) = tolower(players_data$resultSets$headers[[1]])
 
 players = mutate(players,
   person_id = as.numeric(person_id),
-  rosterstatus = !!as.numeric(rosterstatus),
+  rosterstatus = as.logical(as.numeric(rosterstatus)),
   from_year = as.numeric(from_year),
   to_year = as.numeric(to_year),
   team_id = as.numeric(team_id)
 )
 
-if (Sys.Date() <= as.Date("2016-10-25")) {
-  players = mutate(players, to_year = pmin(to_year, 2015))
+if (Sys.Date() <= as.Date("2017-10-20")) {
+  players = mutate(players, to_year = pmin(to_year, 2016))
 }
 
 players$name = sapply(players$display_last_comma_first, function(s) {
