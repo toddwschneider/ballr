@@ -66,7 +66,7 @@ fetch_shots_by_player_id = function(player_id, bigquery_project_id) {
       three_point_shot & shot_angle < 36 ~ "Right Corner 3",
       three_point_shot & shot_angle > 144 ~ "Left Corner 3",
       three_point_shot ~ "Above the Break 3",
-      TRUE ~ "Mid-range"
+      TRUE ~ "Mid-Range"
     ),
     shot_made_numeric = as.numeric(shot_made),
     shot_made_flag = factor(shot_made, levels = c(TRUE, FALSE), labels = c("made", "missed")),
