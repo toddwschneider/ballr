@@ -1,63 +1,33 @@
-# BallR: Interactive NBA Shot Charts with R and Shiny
+# College BallR: Interactive NCAA Men's Basketball Shot Charts with R and Shiny
 
-[BallR](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/) uses the [NBA Stats API](http://stats.nba.com/) to visualize every shot taken by a player during an NBA season dating back to 1996.
+College BallR uses [data provided by Sportradar on Google BigQuery](https://console.cloud.google.com/launcher/details/ncaa-bb-public/ncaa-basketball) to visualize NCAA men's basketball shots. It is a modification of the [NBA BallR app](https://github.com/toddwschneider/ballr).
 
-[See this post for a live version of the app](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+You'll need to set up a Google BigQuery project in order to use College BallR. Note that BigQuery currently provides some free operations each month, but if you go over those limits then you will be charged. See here for more: https://cloud.google.com/bigquery/pricing
+
+## Notes
+
+College BallR was hacked together fairly quickly from NBA BallR and should be considered experimental.
+
+The Sportradar BigQuery API is considerably more flexible than the NBA Stats API, which means that with more work, College BallR should be able to support shot charts by team, conference, mascot name, and many other dimensions. For now though it only support shot charts by player.
 
 ## Run your own local version
 
-You can run BallR as on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
+You can run College BallR on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
 
 ```R
-packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite")
+packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite", "bigrquery", "lubridate")
 install.packages(packages, repos = "https://cran.rstudio.com/")
 library(shiny)
-runGitHub("ballr", "toddwschneider")
+runGitHub("ballr", "toddwschneider", ref = "college")
 ```
+
+Enter your BigQuery credentials at the top of the sidebar, wait a few seconds for the app to fetch data from BigQuery, and you should be good to go.
 
 ## Screenshot
 
-[![ballr](https://cloud.githubusercontent.com/assets/70271/13547819/b74dca58-e2ae-11e5-8f00-7c3c768e77e3.png)](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+![college ballr](https://user-images.githubusercontent.com/70271/37571037-fc316b7a-2acd-11e8-83f7-e3a640f72b6b.png)
 
-There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**
-
-### Hexagonal
-
-Hexagonal charts, which are influenced by the work of [Kirk Goldsberry at Grantland](https://grantland.com/contributors/kirk-goldsberry/), use R's `hexbin` package to bin shots into hexagonal regions. The size and opacity of each hexagon are proportional to the number of shots taken within that region, and the color of each hexagon represents your choice of metric, which can be one of:
-
-- FG% vs. league average
-- FG%
-- Points per shot
-
-There are two sliders to adjust the maximum hexagon sizes, and also the variability of sizes across hexagons, e.g. [here's the same Stephen Curry chart](https://cloud.githubusercontent.com/assets/70271/13547845/63f4101e-e2af-11e5-9a57-13a8a61b367a.png) but with larger hexagons, and plotting points per shot as the color metric.
-
-Note that the color metrics are not plotted at the individual hexagon level, but at the court region level, e.g. all hexagons on the left side of the court that are 16-24 feet from the basket will have the same color. If BallR were extended to, say, chart all shots for an entire team, then it might make sense to assign colors at the hexagon-level, but for single players that tends to produce excessive noise.
-
-### Scatter
-
-Scatter charts are the most straightforward option: they show the location of each individual shot, with color-coding for makes and misses
-
-![scatter](https://cloud.githubusercontent.com/assets/70271/13382173/dfae7f46-de3b-11e5-9ca6-1e2740904b60.png)
-
-### Heat map
-
-Heat map charts use [two-dimensional kernel density estimation](https://en.wikipedia.org/wiki/Multivariate_kernel_density_estimation) to show the distribution of shot attempts across the court.
-
-Anecdotally I've found that heat maps often show, unsurprisingly, that most shot attempts are taken in the restricted area near the basket. It might be more interesting to filter out restricted area shots when generating heat maps, for example here's the heat map of Stephen Curry's shot attempts *excluding* shots from within the restricted area:
-
-![heat map excluding restricted area](https://cloud.githubusercontent.com/assets/70271/13588733/23896d06-e4a0-11e5-887e-f31c636de422.png)
-
-### Filters
-
-BallR lets you filter shots along a few dimensions (zone, angle, distance, made/missed) by adjusting the inputs in the sidebar. When you apply filters, the shot chart and summary stats update automatically to reflect whatever subset of shots you have chosen.
-
-### Data
-
-The data comes directly from the NBA Stats API via the `shotchartdetail` endpoint. See [fetch_shots.R](fetch_shots.R) for the API call itself. The player select input lets you choose any player and season back to 1996, so you can compare, for example, Michael Jordan of 1996 to LeBron James of 2012.
-
-### Acknowledgments
-
-Posts by [Savvas Tjortjoglou](http://savvastjortjoglou.com/nba-shot-sharts.html) and [Eduardo Maia](http://thedatagame.com.au/2015/09/27/how-to-create-nba-shot-charts-in-r/) about making NBA shot charts in Python and R, respectively, served as useful resources
+There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**. Read more about them on [the NBA version's README page](https://github.com/toddwschneider/ballr).
 
 ## Questions/issues/contact
 

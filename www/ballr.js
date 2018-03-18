@@ -13,17 +13,14 @@ $(function() {
     });
   });
 
-  $("#player_name").selectize({
-    selectOnTab: true,
-    maxOptions: 5000,
-    onDropdownOpen: function() {
-      this.clear('silent');
-    }
-  });
-
   $("#shot_zone_basic_filter").attr("title", "Filter shot zones...");
   $("#shot_zone_angle_filter").attr("title", "Filter shot angles...");
   $("#shot_distance_filter").attr("title", "Filter shot distances...");
+  $("#season_filter").attr("title", "Filter seasons...");
 
-  $("#shot_zone_basic_filter, #shot_zone_angle_filter, #shot_distance_filter").selectpicker();
+  $("#season_filter").on("change", function() {
+    $(this).selectpicker('refresh');
+  });
+
+  $("#shot_zone_basic_filter, #shot_zone_angle_filter, #shot_distance_filter, #season_filter").selectpicker();
 });

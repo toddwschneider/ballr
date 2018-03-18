@@ -1,3 +1,4 @@
 .Rapp.history
 .DS_Store
 rsconnect/
+.httr-oauth

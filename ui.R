@@ -4,6 +4,9 @@ library(hexbin)
 library(dplyr)
 library(httr)
 library(jsonlite)
+library(bigrquery)
+library(lubridate)
+options("httr_oob_default" = TRUE)
 
 source("helpers.R")
 source("plot_court.R")
@@ -16,7 +19,7 @@ source("heatmap_chart.R")
 shinyUI(
   fixedPage(
     theme = "flatly.css",
-    title = "BallR: Interactive NBA Shot Charts with R and Shiny",
+    title = "College BallR: Interactive NCAA Men's Basketball Shot Charts with R and Shiny",
 
     tags$head(
       tags$link(rel = "apple-touch-icon", href = "basketball.png"),
@@ -37,10 +40,10 @@ shinyUI(
           <div>
             <ul class="nav navbar-nav col-xs-12">
               <li class="col-xs-8 col-md-9">
-                <a href="#">BallR<span class="hidden-xs">: Interactive NBA Shot Charts</span></a>
+                <a href="#">College BallR<span class="hidden-xs">: Interactive NCAA Men’s Basketball Shot Charts</span></a>
               </li>
               <li class="col-xs-4 col-md-3 github-link">
-                <a href="https://github.com/toddwschneider/ballr" target="_blank">
+                <a href="https://github.com/toddwschneider/ballr/tree/college" target="_blank">
                   <span class="hidden-xs">Code on </span>GitHub
                 </a>
               </li>
@@ -52,11 +55,13 @@ shinyUI(
 
     fixedRow(class = "primary-content",
       div(class = "col-sm-8 col-md-9",
+        uiOutput("bigquery_notice"),
+
         div(class = "shot-chart-container",
           div(class = "shot-chart-header",
             h2(textOutput("chart_header_player")),
-            h4(textOutput("chart_header_info")),
-            h4(textOutput("chart_header_team"))
+            h4(textOutput("chart_header_team")),
+            h4(textOutput("chart_header_info"))
           ),
 
           plotOutput("court", height = "auto"),
@@ -76,30 +81,34 @@ shinyUI(
 
       div(class = "col-sm-4 col-md-3",
         div(class = "shot-chart-inputs",
-          uiOutput("player_photo"),
+          textInput("bigquery_project_id", "BigQuery Project Name or ID"),
 
-          selectInput(inputId = "player_name",
-                      label = "Player",
-                      choices = c("Enter a player..." = "", available_players$name),
-                      selected = default_player$name,
-                      selectize = FALSE),
-
-          selectInput(inputId = "season",
-                      label = "Season",
-                      choices = rev(default_seasons),
-                      selected = default_season,
-                      selectize = FALSE),
+          selectizeInput(inputId = "player_name",
+                        label = "Player",
+                        choices = c("Enter a player..." = "", default_player_name),
+                        selected = default_player_name,
+                        options = list(
+                          selectOnTab = TRUE,
+                          maxOptions = 20000,
+                          onDropdownOpen = I("function() { this.clear('silent'); }")
+                        )),
 
           radioButtons(inputId = "chart_type",
                        label = "Chart Type",
                        choices = c("Hexagonal", "Scatter", "Heat Map"),
-                       selected = "Hexagonal"),
+                       selected = "Scatter"),
 
           uiOutput("hex_metric_buttons"),
           uiOutput("hexbinwidth_slider"),
           uiOutput("hex_radius_slider"),
 
           h4("Filters"),
+
+          selectInput(inputId = "season_filter",
+                      label = "Seasons",
+                      choices = rev(c("2013-14", "2014-15", "2015-16", "2016-17", "2017-18")),
+                      multiple = TRUE,
+                      selectize = FALSE),
 
           selectInput(inputId = "shot_zone_basic_filter",
                       label = "Shot Zones",

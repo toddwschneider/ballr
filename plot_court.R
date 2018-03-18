@@ -32,12 +32,9 @@ backboard_offset = 4
 neck_length = 0.5
 hoop_radius = 0.75
 hoop_center_y = backboard_offset + neck_length + hoop_radius
-three_point_radius = 23.75
-three_point_side_radius = 22
-three_point_side_height = 14
-
-short_three_radius = 22
-short_three_seasons = c("1994-95", "1995-96", "1996-97")
+three_point_radius = 20.75
+three_point_side_radius = 20.75
+three_point_side_height = hoop_center_y
 
 court_points = data.frame(
   x = c(width / 2, width / 2, -width / 2, -width / 2, width / 2),
@@ -72,7 +69,6 @@ restricted = circle_points(center = c(0, hoop_center_y), radius = 4) %>%
   mutate(desc = "restricted")
 
 three_point_circle = circle_points(center = c(0, hoop_center_y), radius = three_point_radius) %>% filter(y >= three_point_side_height)
-short_three_circle = circle_points(center = c(0, hoop_center_y), radius = short_three_radius) %>% filter(y >= hoop_center_y)
 
 three_point_line = data.frame(
   x = c(three_point_side_radius, three_point_side_radius, three_point_circle$x, -three_point_side_radius, -three_point_side_radius),
@@ -80,30 +76,13 @@ three_point_line = data.frame(
   desc = "three_point_line"
 )
 
-short_three_line = data.frame(
-  x = c(three_point_side_radius, three_point_side_radius, short_three_circle$x, -three_point_side_radius, -three_point_side_radius),
-  y = c(0, hoop_center_y, short_three_circle$y, hoop_center_y, 0),
-  desc = "short_three_line"
-)
-
 court_without_three = rbind(court_points , foul_circle_top, foul_circle_bottom, hoop, restricted)
 
 court_points = rbind(court_without_three, three_point_line)
 court_points = mutate(court_points , dash = (desc == "foul_circle_bottom"))
 
-short_three_court_points = rbind(court_without_three, short_three_line)
-short_three_court_points = mutate(short_three_court_points , dash = (desc == "foul_circle_bottom"))
-
 court = ggplot() +
   geom_path(data = court_points,
-            aes(x = x, y = y, group = desc, linetype = dash),
-            color = "#999999") +
-  scale_linetype_manual(values = c("solid", "longdash"), guide = FALSE) +
-  coord_fixed(ylim = c(0, 35), xlim = c(-25, 25)) +
-  theme_court(base_size = 22)
-
-short_three_court = ggplot() +
-  geom_path(data = short_three_court_points,
             aes(x = x, y = y, group = desc, linetype = dash),
             color = "#999999") +
   scale_linetype_manual(values = c("solid", "longdash"), guide = FALSE) +

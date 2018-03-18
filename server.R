@@ -1,70 +1,84 @@
 library(shiny)
 
 shinyServer(function(input, output, session) {
-  current_player = reactive({
-    req(input$player_name)
-    find_player_by_name(input$player_name)
+  bigquery_project_id = reactive({
+    input$bigquery_project_id
   })
 
-  current_player_seasons = reactive({
-    req(current_player())
-
-    first = max(current_player()$from_year, first_year_of_data)
-    last = current_player()$to_year
-    as.character(season_strings[as.character(first:last)])
-  })
-
-  current_season = reactive({
-    req(input$season)
-    input$season
-  })
-
-  update_season_input = observe({
-    req(current_player(), current_player_seasons())
-
-    isolate({
-      if (current_season() %in% current_player_seasons()) {
-        selected_value = current_season()
-      } else {
-        selected_value = rev(current_player_seasons())[1]
-      }
-
-      updateSelectInput(session,
-                        "season",
-                        choices = rev(current_player_seasons()),
-                        selected = selected_value)
-    })
-  })
-
-  shots = reactive({
-    req(current_player(), current_season())
-    req(current_season() %in% current_player_seasons())
-
-    use_default_shots = current_player()$person_id == default_player$person_id & current_season() == default_season
-
-    if (use_default_shots) {
-      default_shots
-    } else {
-      fetch_shots_by_player_id_and_season(current_player()$person_id, current_season())
+  output$bigquery_notice = renderUI({
+    if (bigquery_project_id() == "") {
+      h2("Enter your BigQuery project info to get started")
     }
   })
 
-  filtered_shots = reactive({
-    req(input$shot_result_filter, shots()$player)
+  players = reactive({
+    req(bigquery_project_id())
 
-    filter(shots()$player,
+    withProgress({
+      fetch_all_players(bigquery_project_id())
+    }, message = "Fetching players data...")
+  })
+
+  update_players_input = observe({
+    req(players())
+
+    current_selection = input$player_name
+
+    updateSelectInput(
+      session,
+      "player_name",
+      choices = c("Enter a player..." = "", players()$name),
+      selected = current_selection
+    )
+  })
+
+  current_player = reactive({
+    req(bigquery_project_id(), input$player_name)
+    filter(players(), lower_name == tolower(input$player_name))
+  })
+
+  current_player_seasons = reactive({
+    req(shots())
+    shots()$season %>% unique() %>% sort()
+  })
+
+  current_seasons = reactive({
+    if (is.null(input$season_filter)) {
+      current_player_seasons()
+    } else {
+      input$season_filter
+    }
+  })
+
+  update_season_input = observe({
+    updateSelectInput(session,
+                      "season_filter",
+                      choices = rev(current_player_seasons()),
+                      selected = NULL)
+  })
+
+  shots = reactive({
+    req(current_player(), bigquery_project_id())
+    fetch_shots_by_player_id(current_player()$player_id, bigquery_project_id())
+  })
+
+  filtered_shots = reactive({
+    req(input$shot_result_filter, shots())
+
+    filter(shots(),
       input$shot_result_filter == "all" | shot_made_flag == input$shot_result_filter,
       shot_zone_basic != "Backcourt",
       is.null(input$shot_zone_basic_filter) | shot_zone_basic %in% input$shot_zone_basic_filter,
       is.null(input$shot_zone_angle_filter) | shot_zone_area %in% input$shot_zone_angle_filter,
-      is.null(input$shot_distance_filter) | shot_zone_range %in% input$shot_distance_filter
+      is.null(input$shot_distance_filter) | shot_zone_range %in% input$shot_distance_filter,
+      is.null(input$season_filter) | season %in% input$season_filter
     )
   })
 
   hexbin_data = reactive({
     req(filtered_shots(), shots(), hexbinwidths(), input$hex_radius)
 
-    calculate_hexbins_from_shots(filtered_shots(), shots()$league_averages,
+    calculate_hexbins_from_shots(filtered_shots(),
                                  binwidths = hexbinwidths(),
                                  min_radius_factor = input$hex_radius)
   })
@@ -108,17 +122,15 @@ shinyServer(function(input, output, session) {
 
     selectInput("hex_metric",
                 "Hexagon Colors",
-                choices = c("FG% vs. League Avg" = "bounded_fg_diff",
-                            "FG%" = "bounded_fg_pct",
+                choices = c("FG%" = "bounded_fg_pct",
                             "Points Per Shot" = "bounded_points_per_shot"),
-                selected = "bounded_fg_diff",
+                selected = "bounded_fg_pct",
                 selectize = FALSE)
   })
 
   shot_chart = reactive({
-    req(filtered_shots(), current_player(), current_season(), input$chart_type)
+    req(filtered_shots(), current_player(), input$chart_type)
 
-    short_three = current_season() %in% short_three_seasons
     filters_applied()
 
     if (input$chart_type == "Hexagonal") {
@@ -126,14 +138,13 @@ shinyServer(function(input, output, session) {
 
       generate_hex_chart(
         hex_data = hexbin_data(),
-        use_short_three = short_three,
         metric = input$hex_metric,
         alpha_range = alpha_range()
       )
     } else if (input$chart_type == "Scatter") {
-      generate_scatter_chart(filtered_shots(), use_short_three = short_three)
+      generate_scatter_chart(filtered_shots())
     } else if (input$chart_type == "Heat Map") {
-      generate_heatmap_chart(filtered_shots(), use_short_three = short_three)
+      generate_heatmap_chart(filtered_shots())
     } else {
       stop("invalid chart type")
     }
@@ -145,20 +156,20 @@ shinyServer(function(input, output, session) {
   })
 
   output$chart_header_info = renderText({
-    req(current_season(), shots())
-    paste(current_season(), "Regular Season")
+    req(shots())
+    paste(current_seasons(), collapse = ", ")
   })
 
   output$chart_header_team = renderText({
-    req(shots()$player)
-    paste0(unique(shots()$player$team_name), collapse = ", ")
+    req(shots())
+    current_player()$team
   })
 
   output$shot_chart_footer = renderUI({
     req(shot_chart())
 
     tags$div(
-      "Data via stats.nba.com",
+      "Data via Sportradar on Google BigQuery",
       tags$br(),
       "toddwschneider.com/ballr"
     )
@@ -169,7 +180,6 @@ shinyServer(function(input, output, session) {
 
     filename_parts = c(
       current_player()$name,
-      current_season(),
       "Shot Chart",
       input$chart_type
     )
@@ -179,14 +189,6 @@ shinyServer(function(input, output, session) {
            href = "#",
            class = "download-shot-chart",
            "data-filename" = paste0(fname, ".png"))
-  })
-
-  output$player_photo = renderUI({
-    if (input$player_name == "") {
-      tags$img(src = "http://i.imgur.com/hXWPTOF.png", alt = "photo")
-    } else if (req(current_player()$person_id)) {
-      tags$img(src = player_photo_url(current_player()$person_id), alt = "photo")
-    }
   })
 
   output$court = renderPlot({
@@ -232,7 +234,7 @@ shinyServer(function(input, output, session) {
 
   output$summary_stats_header = renderText({
     req(current_player())
-    paste(current_player()$name, current_season(), "Summary Stats")
+    paste(current_player()$name, "Summary Stats")
   })
 
   output$summary_stats = renderUI({
@@ -246,59 +248,44 @@ shinyServer(function(input, output, session) {
                 pct = mean(shot_made_numeric),
                 pct_as_text = fraction_to_percent_format(pct),
                 points_per_shot = mean(shot_value * shot_made_numeric)) %>%
-      arrange(desc(fga), desc(fgm))
+      arrange(desc(fga), desc(fgm)) %>%
+      ungroup()
 
-    league_zone = shots()$league_averages %>%
-      group_by(shot_zone_basic) %>%
-      summarize(lg_fgm = sum(fgm),
-                lg_fga = sum(fga),
-                lg_pct = lg_fgm / lg_fga,
-                lg_pct_as_text = fraction_to_percent_format(lg_pct),
-                lg_points_per_shot = round(mean(shot_value * lg_pct), 2))
-
-    merged = inner_join(player_zone, league_zone, by = "shot_zone_basic")
+    # NCAA data does not include league averages
+    merged = player_zone
 
     overall = summarize(merged,
       total_fgm = sum(fgm),
       total_fga = sum(fga),
       pct = total_fgm / total_fga,
       pct_as_text = fraction_to_percent_format(pct),
-      points_per_shot = sum(points_per_shot * fga) / sum(fga),
-      lg_pct = sum(lg_fgm) / sum(lg_fga),
-      lg_pct_as_text = fraction_to_percent_format(lg_pct),
-      lg_points_per_shot = sum(lg_points_per_shot * lg_fga) / sum(lg_fga)
+      points_per_shot = sum(points_per_shot * fga) / sum(fga)
     )
 
     html = list(div(class = "row headers",
       span(class = "col-xs-4 col-md-3 zone-label", "Zone"),
-      span(class = "col-xs-2 col-md-1 numeric", "FGM"),
-      span(class = "col-xs-2 col-md-1 numeric", "FGA"),
-      span(class = "col-xs-2 col-md-2 numeric", "FG%"),
-      span(class = "col-xs-2 col-md-1 numeric", "Lg FG%"),
-      span(class = "hidden-xs hidden-sm col-md-2 numeric", "Pts/Shot"),
-      span(class = "hidden-xs hidden-sm col-md-1 numeric", "Lg Pts/Shot")
+      span(class = "col-xs-2 numeric", "FGM"),
+      span(class = "col-xs-2 numeric", "FGA"),
+      span(class = "col-xs-2 numeric", "FG%"),
+      span(class = "col-xs-2 numeric", "Pts/Shot")
     ))
 
     for (i in 1:nrow(merged)) {
       html[[i + 2]] = div(class = paste("row", ifelse(i %% 2 == 0, "even", "odd")),
         span(class = "col-xs-4 col-md-3 zone-label", merged$shot_zone_basic[i]),
-        span(class = "col-xs-2 col-md-1 numeric", merged$fgm[i]),
-        span(class = "col-xs-2 col-md-1 numeric", merged$fga[i]),
-        span(class = "col-xs-2 col-md-2 numeric", merged$pct_as_text[i]),
-        span(class = "col-xs-2 col-md-1 numeric", merged$lg_pct_as_text[i]),
-        span(class = "hidden-xs hidden-sm col-md-2 numeric", round(merged$points_per_shot[i], 2)),
-        span(class = "hidden-xs hidden-sm col-md-1 numeric", round(merged$lg_points_per_shot[i], 2))
+        span(class = "col-xs-2 numeric", merged$fgm[i]),
+        span(class = "col-xs-2 numeric", merged$fga[i]),
+        span(class = "col-xs-2 numeric", merged$pct_as_text[i]),
+        span(class = "col-xs-2 numeric", round(merged$points_per_shot[i], 2))
       )
     }
 
     html[[length(html) + 1]] = div(class = "row overall",
       span(class = "col-xs-4 col-md-3 zone-label", "Overall"),
-      span(class = "col-xs-2 col-md-1 numeric", overall$total_fgm),
-      span(class = "col-xs-2 col-md-1 numeric", overall$total_fga),
-      span(class = "col-xs-2 col-md-2 numeric", overall$pct_as_text),
-      span(class = "col-xs-2 col-md-1 numeric", overall$lg_pct_as_text),
-      span(class = "hidden-xs hidden-sm col-md-2 numeric", round(overall$points_per_shot, 2)),
-      span(class = "hidden-xs hidden-sm col-md-1 numeric", round(overall$lg_points_per_shot, 2))
+      span(class = "col-xs-2 numeric", overall$total_fgm),
+      span(class = "col-xs-2 numeric", overall$total_fga),
+      span(class = "col-xs-2 numeric", overall$pct_as_text),
+      span(class = "col-xs-2 numeric", round(overall$points_per_shot, 2))
     )
 
     html

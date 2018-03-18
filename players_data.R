@@ -1,71 +1,51 @@
-players_url = "http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2015-16&IsOnlyCurrentSeason=0"
+default_player_name = "Trae Young"
 
-request_headers = c(
-  "accept-encoding" = "gzip, deflate, sdch",
-  "accept-language" = "en-US,en;q=0.8",
-  "cache-control" = "no-cache",
-  "connection" = "keep-alive",
-  "host" = "stats.nba.com",
-  "pragma" = "no-cache",
-  "upgrade-insecure-requests" = "1",
-  "user-agent" = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
-)
+fetch_all_players = function(bigquery_project_id) {
+  players_sql = "
+    SELECT
+      player_id,
+      player_full_name,
+      team_market,
+      team_name
+    FROM [bigquery-public-data:ncaa_basketball.mbb_pbp_sr]
+    WHERE type = 'fieldgoal'
+      AND event_coord_x IS NOT NULL
+      AND event_coord_y IS NOT NULL
+    GROUP BY player_id, player_full_name, team_market, team_name
+  "
 
-request = GET(players_url, add_headers(request_headers))
+  players_raw = query_exec(players_sql, bigquery_project_id) %>%
+    as_data_frame()
 
-players_data = fromJSON(content(request, as = "text"))
-players = tbl_df(data.frame(players_data$resultSets$rowSet[[1]], stringsAsFactors = FALSE))
-names(players) = tolower(players_data$resultSets$headers[[1]])
+  players_with_unique_names = players_raw %>%
+    group_by(player_full_name) %>%
+    summarize(
+      n = n_distinct(player_id),
+      team = paste0(paste(team_market, team_name), collapse = ", "),
+      player_id = first(player_id)
+    ) %>%
+    ungroup() %>%
+    filter(n == 1) %>%
+    select(player_id, player_full_name, team)
 
-players = mutate(players,
-  person_id = as.numeric(person_id),
-  rosterstatus = !!as.numeric(rosterstatus),
-  from_year = as.numeric(from_year),
-  to_year = as.numeric(to_year),
-  team_id = as.numeric(team_id)
-)
+  players_with_non_unique_names = players_raw %>%
+    filter(!(player_id %in% players_with_unique_names$player_id)) %>%
+    transmute(
+      player_id = player_id,
+      player_full_name = paste0(player_full_name, " (", team_market, ")"),
+      team = paste(team_market, team_name)
+    )
 
-if (Sys.Date() <= as.Date("2016-10-25")) {
-  players = mutate(players, to_year = pmin(to_year, 2015))
-}
+  players = bind_rows(players_with_unique_names, players_with_non_unique_names) %>%
+    group_by(player_id) %>%
+    arrange(player_full_name) %>%
+    summarize(
+      name = first(player_full_name),
+      team = first(team)
+    ) %>%
+    ungroup() %>%
+    mutate(lower_name = tolower(name)) %>%
+    arrange(lower_name)
 
-players$name = sapply(players$display_last_comma_first, function(s) {
-  paste(rev(strsplit(s, ", ")[[1]]), collapse = " ")
-})
-
-first_year_of_data = 1996
-last_year_of_data = max(players$to_year)
-season_strings = paste(first_year_of_data:last_year_of_data,
-                       substr(first_year_of_data:last_year_of_data + 1, 3, 4),
-                       sep = "-")
-names(season_strings) = first_year_of_data:last_year_of_data
-
-available_players = filter(players, to_year >= first_year_of_data)
-
-names_table = table(available_players$name)
-dupe_names = names(names_table[which(names_table > 1)])
-
-available_players$name[available_players$name %in% dupe_names] = paste(
-  available_players$name[available_players$name %in% dupe_names],
-  available_players$person_id[available_players$name %in% dupe_names]
-)
-
-available_players$lower_name = tolower(available_players$name)
-available_players = arrange(available_players, lower_name)
-
-find_player_by_name = function(n) {
-  filter(available_players, lower_name == tolower(n))
-}
-
-find_player_id_by_name = function(n) {
-  find_player_by_name(n)$person_id
-}
-
-default_player = find_player_by_name("Stephen Curry")
-default_years = as.character(default_player$from_year:default_player$to_year)
-default_seasons = as.character(season_strings[default_years])
-default_season = rev(default_seasons)[1]
-
-player_photo_url = function(player_id) {
-  paste0("http://stats.nba.com/media/players/230x185/", player_id, ".png")
+  return(players)
 }

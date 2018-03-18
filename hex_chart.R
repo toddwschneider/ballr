@@ -66,7 +66,7 @@ calculate_hex_coords = function(shots, binwidths) {
   inner_join(hexbin_coords, hexbin_stats, by = "hexbin_id")
 }
 
-calculate_hexbins_from_shots = function(shots, league_averages, binwidths = c(1, 1), min_radius_factor = 0.6, fg_diff_limits = c(-0.12, 0.12), fg_pct_limits = c(0.2, 0.7), pps_limits = c(0.5, 1.5)) {
+calculate_hexbins_from_shots = function(shots, binwidths = c(1, 1), min_radius_factor = 0.6, fg_pct_limits = c(0.2, 0.7), pps_limits = c(0.5, 1.5)) {
   if (nrow(shots) == 0) {
     return(list())
   }
@@ -81,17 +81,12 @@ calculate_hexbins_from_shots = function(shots, league_averages, binwidths = c(1,
       zone_points_per_shot = mean(shot_made_numeric * shot_value)
     )
 
-  league_zone_stats = league_averages %>%
-    group_by(shot_zone_range, shot_zone_area) %>%
-    summarize(league_pct = sum(fgm) / sum(fga))
-
   hex_data = calculate_hex_coords(shots, binwidths = binwidths)
 
   join_keys = c("shot_zone_area", "shot_zone_range")
 
   hex_data = hex_data %>%
-    inner_join(zone_stats, by = join_keys) %>%
-    inner_join(league_zone_stats, by = join_keys)
+    inner_join(zone_stats, by = join_keys)
 
   max_hex_attempts = max(hex_data$hex_attempts)
 
@@ -99,29 +94,18 @@ calculate_hexbins_from_shots = function(shots, league_averages, binwidths = c(1,
     radius_factor = min_radius_factor + (1 - min_radius_factor) * log(hex_attempts + 1) / log(max_hex_attempts + 1),
     adj_x = center_x + radius_factor * (x - center_x),
     adj_y = center_y + radius_factor * (y - center_y),
-    bounded_fg_diff = pmin(pmax(zone_pct - league_pct, fg_diff_limits[1]), fg_diff_limits[2]),
     bounded_fg_pct = pmin(pmax(zone_pct, fg_pct_limits[1]), fg_pct_limits[2]),
     bounded_points_per_shot = pmin(pmax(zone_points_per_shot, pps_limits[1]), pps_limits[2]))
 
-  list(hex_data = hex_data, fg_diff_limits = fg_diff_limits, fg_pct_limits = fg_pct_limits, pps_limits = pps_limits)
+  list(hex_data = hex_data, fg_pct_limits = fg_pct_limits, pps_limits = pps_limits)
 }
 
-generate_hex_chart = function(hex_data, use_short_three = FALSE, metric = "bounded_fg_diff", alpha_range = c(0.85, 0.98)) {
-  if (use_short_three) {
-    base_court = short_three_court
-  } else {
-    base_court = court    
-  }
-
+generate_hex_chart = function(hex_data, metric = "bounded_fg_diff", alpha_range = c(0.85, 0.98)) {
   if (length(hex_data) == 0) {
-    return(base_court)
+    return(court)
   }
 
-  if (metric == "bounded_fg_diff") {
-    fill_limit = hex_data$fg_diff_limits
-    fill_label = "FG% vs. League Avg"
-    label_formatter = scales::percent
-  } else if (metric == "bounded_fg_pct") {
+  if (metric == "bounded_fg_pct") {
     fill_limit = hex_data$fg_pct_limits
     fill_label = "FG%"
     label_formatter = scales::percent
@@ -133,7 +117,7 @@ generate_hex_chart = function(hex_data, use_short_three = FALSE, metric = "bound
     stop("invalid metric")
   }
 
-  base_court +
+  court +
     geom_polygon(data = hex_data$hex_data,
                  aes_string(x = "adj_x", y = "adj_y", group = "hexbin_id",
                             fill = metric, alpha = "hex_attempts"),
