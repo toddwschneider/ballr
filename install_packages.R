@@ -4,7 +4,9 @@ required_packages = c(
   "hexbin",
   "dplyr",
   "httr",
-  "jsonlite"
+  "jsonlite",
+  "bigrquery",
+  "lubridate"
 )
 
 packages_to_install = required_packages[!(required_packages %in% installed.packages()[, 1])]
