@@ -25,9 +25,13 @@ Enter your BigQuery credentials at the top of the sidebar. If it's your first ti
 
 ## Screenshot
 
+There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**. Read more about them on [the NBA version's README page](https://github.com/toddwschneider/ballr).
+
 ![college ballr](https://i.imgur.com/sHBQpPJ.png)
 
-There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**. Read more about them on [the NBA version's README page](https://github.com/toddwschneider/ballr).
+Team-level prototype (not available in app yet):
+
+![villanova shot chart](https://i.imgur.com/eGW4NS9.png)
 
 ## Questions/issues/contact
 
