@@ -8,7 +8,7 @@ You'll need to set up a Google BigQuery project in order to use College BallR. N
 
 College BallR was hacked together fairly quickly from NBA BallR and should be considered experimental.
 
-The Sportradar BigQuery API is considerably more flexible than the NBA Stats API, which means that with more work, College BallR should be able to support shot charts by team, conference, mascot name, and many other dimensions. For now though it only support shot charts by player.
+The Sportradar BigQuery API is considerably more flexible than the NBA Stats API, which means that with more work, College BallR should be able to support shot charts by team, conference, mascot name, and many other dimensions. For now though it only supports shot charts by player.
 
 ## Run your own local version
 
