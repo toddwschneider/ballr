@@ -21,7 +21,7 @@ library(shiny)
 runGitHub("ballr", "toddwschneider", ref = "college")
 ```
 
-Enter your BigQuery credentials at the top of the sidebar, wait a few seconds for the app to fetch data from BigQuery, and you should be good to go.
+Enter your BigQuery credentials at the top of the sidebar. If it's your first time running the app, switch back to your R console and follow the OAuth prompt on screen. Once that's complete, it takes a few seconds for the app to fetch data from BigQuery, then you should be good to go.
 
 ## Screenshot
 
