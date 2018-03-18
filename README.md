@@ -6,7 +6,7 @@
 
 ## Run your own local version
 
-You can run BallR as on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
+You can run BallR on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
 
 ```R
 packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite")
