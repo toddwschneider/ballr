@@ -6,6 +6,18 @@ all_shots = bind_rows(lapply(seasons, function(season) {
     mutate(season = season)
 }))
 
+###################
+# filter to one user specified 'game_id'
+###################
+
+names(all_shots)
+game_id_from_shiny_field = '0020300014'
+shots_one_game = all_shots %>% 
+  filter(game_id %in% game_id_from_shiny_field)
+# head(shots_one_game)
+
+###################
+
 simplified_areas = c(
   "Center(C)" = "Center",
   "Left Side(L)" = "Left",
