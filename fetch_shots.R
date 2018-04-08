@@ -61,7 +61,8 @@ fetch_shots_by_player_id_and_season = function(player_id, season) {
     shot_made_numeric = as.numeric(as.character(shot_made_flag)),
     shot_made_flag = factor(shot_made_flag, levels = c("1", "0"), labels = c("made", "missed")),
     shot_attempted_flag = as.numeric(as.character(shot_attempted_flag)),
-    shot_value = ifelse(tolower(shot_type) == "3pt field goal", 3, 2)
+    shot_value = ifelse(tolower(shot_type) == "3pt field goal", 3, 2),
+    game_date = as.Date(game_date, format = "%Y%m%d")
   )
 
   raw_league_avg_data = data$resultSets[[2]]$rowSet

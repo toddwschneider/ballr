@@ -90,6 +90,11 @@ shinyUI(
                       selected = default_season,
                       selectize = FALSE),
 
+          dateRangeInput(inputId = "date_range",
+                         label = "Date range",
+                         start = FALSE,
+                         end = FALSE),
+
           radioButtons(inputId = "chart_type",
                        label = "Chart Type",
                        choices = c("Hexagonal", "Scatter", "Heat Map"),

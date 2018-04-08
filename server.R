@@ -57,7 +57,9 @@ shinyServer(function(input, output, session) {
       shot_zone_basic != "Backcourt",
       is.null(input$shot_zone_basic_filter) | shot_zone_basic %in% input$shot_zone_basic_filter,
       is.null(input$shot_zone_angle_filter) | shot_zone_area %in% input$shot_zone_angle_filter,
-      is.null(input$shot_distance_filter) | shot_zone_range %in% input$shot_distance_filter
+      is.null(input$shot_distance_filter) | shot_zone_range %in% input$shot_distance_filter,
+      is.na(input$date_range[1]) | game_date >= input$date_range[1],
+      is.na(input$date_range[2]) | game_date <= input$date_range[2]
     )
   })
 
@@ -214,6 +216,13 @@ shinyServer(function(input, output, session) {
 
     if (input$shot_result_filter != "all") {
       filters[["Result"]] = paste("Result:", input$shot_result_filter)
+    }
+
+    if (!is.na(input$date_range[1]) | !is.na(input$date_range[2])) {
+      dates = format(input$date_range, "%m/%d/%y")
+      dates[is.na(dates)] = ""
+
+      filters[["Dates"]] = paste("Dates:", paste(dates, collapse = "–"))
     }
 
     filters
