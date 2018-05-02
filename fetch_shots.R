@@ -1,12 +1,13 @@
-fetch_shots_by_player_id_and_season = function(player_id, season) {
-  req(player_id, season)
+fetch_shots_by_player_id_and_season = function(player_id, season, season_type = "Regular Season") {
+  req(player_id, season, season_type)
 
   request = GET(
     "http://stats.nba.com/stats/shotchartdetail",
     query = list(
       PlayerID = player_id,
-      PlayerPosition = "",
       Season = season,
+      SeasonType = season_type,
+      PlayerPosition = "",
       ContextMeasure = "FGA",
       DateFrom = "",
       DateTo = "",
@@ -22,7 +23,6 @@ fetch_shots_by_player_id_and_season = function(player_id, season) {
       Position = "",
       RookieYear = "",
       SeasonSegment = "",
-      SeasonType = "Regular Season",
       TeamID = 0,
       VsConference = "",
       VsDivision = ""
@@ -81,4 +81,8 @@ fetch_shots_by_player_id_and_season = function(player_id, season) {
   return(list(player = shots, league_averages = league_averages))
 }
 
-default_shots = fetch_shots_by_player_id_and_season(default_player$person_id, default_season)
+default_shots = fetch_shots_by_player_id_and_season(
+  default_player$person_id,
+  default_season,
+  default_season_type
+)

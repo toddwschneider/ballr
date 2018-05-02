@@ -19,6 +19,11 @@ shinyServer(function(input, output, session) {
     input$season
   })
 
+  current_season_type = reactive({
+    req(input$season_type)
+    input$season_type
+  })
+
   update_season_input = observe({
     req(current_player(), current_player_seasons())
 
@@ -37,15 +42,23 @@ shinyServer(function(input, output, session) {
   })
 
   shots = reactive({
-    req(current_player(), current_season())
+    req(current_player(), current_season(), current_season_type())
     req(current_season() %in% current_player_seasons())
 
-    use_default_shots = current_player()$person_id == default_player$person_id & current_season() == default_season
+    use_default_shots = all(
+      current_player()$person_id == default_player$person_id,
+      current_season() == default_season,
+      current_season_type() == default_season_type
+    )
 
     if (use_default_shots) {
       default_shots
     } else {
-      fetch_shots_by_player_id_and_season(current_player()$person_id, current_season())
+      fetch_shots_by_player_id_and_season(
+        current_player()$person_id,
+        current_season(),
+        current_season_type()
+      )
     }
   })
 
@@ -148,7 +161,7 @@ shinyServer(function(input, output, session) {
 
   output$chart_header_info = renderText({
     req(current_season(), shots())
-    paste(current_season(), "Regular Season")
+    paste(current_season(), current_season_type())
   })
 
   output$chart_header_team = renderText({
