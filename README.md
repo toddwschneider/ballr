@@ -2,7 +2,7 @@
 
 [BallR](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/) uses the [NBA Stats API](http://stats.nba.com/) to visualize every shot taken by a player during an NBA season dating back to 1996.
 
-[See this post for a live version of the app](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+[See this post for more info](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
 
 See also [the college branch of this repo](https://github.com/toddwschneider/ballr/tree/college) for men's college basketball shot charts.
 
@@ -56,6 +56,14 @@ BallR lets you filter shots along a few dimensions (zone, angle, distance, made/
 ### Data
 
 The data comes directly from the NBA Stats API via the `shotchartdetail` endpoint. See [fetch_shots.R](fetch_shots.R) for the API call itself. The player select input lets you choose any player and season back to 1996, so you can compare, for example, Michael Jordan of 1996 to LeBron James of 2012.
+
+### See also: NBA Shots DB
+
+NBA Shots DB is a Rails app that populates a PostgreSQL database with every NBA shot attempt since 1996 (4.5 million shots and growing).
+
+https://github.com/toddwschneider/nba-shots-db
+
+BallR does not interact with NBA Shots DB yet, but that might change in the future.
 
 ### Acknowledgments
 

@@ -90,6 +90,11 @@ shinyUI(
                       selected = default_season,
                       selectize = FALSE),
 
+          radioButtons(inputId = "season_type",
+                       label = "Season Type",
+                       choices = c("Regular Season", "Playoffs"),
+                       selected = default_season_type),
+
           dateRangeInput(inputId = "date_range",
                          label = "Date range",
                          start = FALSE,

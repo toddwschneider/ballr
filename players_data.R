@@ -65,6 +65,7 @@ default_player = find_player_by_name("Stephen Curry")
 default_years = as.character(default_player$from_year:default_player$to_year)
 default_seasons = as.character(season_strings[default_years])
 default_season = rev(default_seasons)[1]
+default_season_type = "Regular Season"
 
 player_photo_url = function(player_id) {
   paste0("http://stats.nba.com/media/players/230x185/", player_id, ".png")
