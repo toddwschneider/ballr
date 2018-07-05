@@ -2,7 +2,7 @@ generate_scatter_chart = function(shots, use_short_three = FALSE) {
   if (use_short_three) {
     base_court = short_three_court
   } else {
-    base_court = court    
+    base_court = court
   }
 
   base_court +

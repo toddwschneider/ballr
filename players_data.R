@@ -68,6 +68,8 @@ default_seasons = as.character(season_strings[default_years])
 default_season_ix = ifelse(as.numeric(format(Sys.Date(), "%m")) %in% 7:10, 2, 1)
 default_season = rev(default_seasons)[default_season_ix]
 
+default_season_type = "Regular Season"
+
 player_photo_url = function(player_id) {
   paste0("http://stats.nba.com/media/players/230x185/", player_id, ".png")
 }
