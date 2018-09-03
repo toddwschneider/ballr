@@ -1,11 +1,24 @@
+required_ggplot2_version = "3.0.0"
+
+if (packageVersion("ggplot2") < required_ggplot2_version) {
+  stop(paste(
+    "ggplot2 version",
+    packageVersion("ggplot2"),
+    "detected; please upgrade to at least",
+    required_ggplot2_version
+  ))
+}
+
 fraction_to_percent_format = function(frac, digits = 1) {
   paste0(format(round(frac * 100, digits), nsmall = digits), "%")
 }
 
+percent_formatter = function(x) {
+  scales::percent(x, accuracy = 1)
+}
+
+points_formatter = function(x) {
+  scales::comma(x, accuracy = 0.01)
+}
+
 bg_color = '#000004'
-
-# from viridis::inferno(100). hard-coded to avoid requiring the viridis package
-inferno_colors = c('#000004', '#010107', '#02020C', '#030312', '#050417', '#07051D', '#0A0723', '#0D0829', '#100A2F', '#140B35', '#170C3B', '#1B0C41', '#1F0C48', '#230C4E', '#280B53', '#2C0B58', '#310A5D', '#350960', '#3A0963', '#3E0966', '#430A68', '#470B6A', '#4B0C6B', '#4F0D6C', '#540F6D', '#58106E', '#5C126E', '#60136E', '#64156E', '#68166E', '#6C186E', '#70196E', '#741B6E', '#781C6D', '#7D1E6D', '#811F6C', '#85216B', '#89226A', '#8D2369', '#912568', '#952667', '#992865', '#9D2964', '#A12B62', '#A52D60', '#A92E5E', '#AD305C', '#B1325A', '#B53458', '#B93656', '#BD3853', '#C03A51', '#C43C4E', '#C83F4C', '#CB4149', '#CF4446', '#D24644', '#D54941', '#D84C3E', '#DB4F3B', '#DE5338', '#E15635', '#E45A32', '#E65D2F', '#E9612B', '#EB6528', '#ED6925', '#EF6D22', '#F1711E', '#F3751B', '#F47A18', '#F67E14', '#F78311', '#F8870E', '#F98C0A', '#FA9008', '#FB9506', '#FB9A06', '#FC9F07', '#FCA409', '#FCA80D', '#FCAD12', '#FCB217', '#FBB71C', '#FBBC22', '#FAC128', '#F9C72E', '#F8CC35', '#F7D13C', '#F6D643', '#F5DB4B', '#F4E054', '#F3E45D', '#F2E967', '#F1EE71', '#F2F27C', '#F3F587', '#F5F991', '#F8FC9B', '#FCFFA4')
-
-# viridis::viridis(100)
-viridis_colors = c('#440154', '#450558', '#46085C', '#470C5F', '#471063', '#481466', '#48176A', '#481B6D', '#481E70', '#482273', '#482575', '#482878', '#472B7A', '#472F7D', '#46327F', '#453580', '#453882', '#443B84', '#433E85', '#424186', '#414487', '#3F4788', '#3E4A89', '#3D4D8A', '#3C508B', '#3A538B', '#39558C', '#38588C', '#375B8D', '#355D8D', '#34608D', '#33638D', '#32658E', '#31688E', '#2F6A8E', '#2E6D8E', '#2D6F8E', '#2C728E', '#2B748E', '#2A778E', '#29798E', '#287C8E', '#277E8E', '#26808E', '#26838E', '#25858E', '#24888E', '#238A8D', '#228C8D', '#218F8D', '#20918C', '#20948C', '#1F968B', '#1F998A', '#1E9B8A', '#1F9D89', '#1FA088', '#1FA287', '#20A586', '#22A785', '#23A983', '#25AC82', '#28AE80', '#2BB07E', '#2EB37D', '#31B57B', '#35B779', '#39BA76', '#3DBC74', '#42BE72', '#46C06F', '#4BC26C', '#50C469', '#56C666', '#5BC863', '#61CA60', '#66CC5D', '#6CCE59', '#72CF56', '#79D152', '#7FD34E', '#85D44A', '#8CD646', '#92D742', '#99D93D', '#A0DA39', '#A6DB35', '#ADDC30', '#B4DD2C', '#BBDE27', '#C2DF23', '#C9E01F', '#D0E11C', '#D6E21A', '#DDE318', '#E4E418', '#EAE51A', '#F1E51D', '#F7E620', '#FDE725')
