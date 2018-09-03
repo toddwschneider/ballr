@@ -130,6 +130,28 @@ shinyServer(function(input, output, session) {
                 selectize = FALSE)
   })
 
+  output$scatter_size_slider = renderUI({
+    req(input$chart_type == "Scatter")
+
+    sliderInput("scatter_size",
+                "Dot size",
+                min = 1,
+                max = 10,
+                value = 2.5,
+                step = 0.5)
+  })
+
+  output$scatter_alpha_slider = renderUI({
+    req(input$chart_type == "Scatter")
+
+    sliderInput("scatter_alpha",
+                "Transparency",
+                min = 0.01,
+                max = 1,
+                value = 0.8,
+                step = 0.01)
+  })
+
   shot_chart = reactive({
     req(filtered_shots(), current_player(), current_season(), input$chart_type)
 
@@ -146,7 +168,14 @@ shinyServer(function(input, output, session) {
         alpha_range = alpha_range()
       )
     } else if (input$chart_type == "Scatter") {
-      generate_scatter_chart(filtered_shots(), use_short_three = short_three)
+      req(input$scatter_alpha, input$scatter_size)
+
+      generate_scatter_chart(
+        filtered_shots(),
+        alpha = input$scatter_alpha,
+        size = input$scatter_size,
+        use_short_three = short_three
+      )
     } else if (input$chart_type == "Heat Map") {
       generate_heatmap_chart(filtered_shots(), use_short_three = short_three)
     } else {

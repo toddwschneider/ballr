@@ -109,6 +109,9 @@ shinyUI(
           uiOutput("hexbinwidth_slider"),
           uiOutput("hex_radius_slider"),
 
+          uiOutput("scatter_size_slider"),
+          uiOutput("scatter_alpha_slider"),
+
           h4("Filters"),
 
           selectInput(inputId = "shot_zone_basic_filter",
