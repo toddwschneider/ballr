@@ -120,15 +120,15 @@ generate_hex_chart = function(hex_data, use_short_three = FALSE, metric = "bound
   if (metric == "bounded_fg_diff") {
     fill_limit = hex_data$fg_diff_limits
     fill_label = "FG% vs. League Avg"
-    label_formatter = scales::percent
+    label_formatter = percent_formatter
   } else if (metric == "bounded_fg_pct") {
     fill_limit = hex_data$fg_pct_limits
     fill_label = "FG%"
-    label_formatter = scales::percent
+    label_formatter = percent_formatter
   } else if (metric == "bounded_points_per_shot") {
     fill_limit = hex_data$pps_limits
     fill_label = "Points Per Shot"
-    label_formatter = scales::comma
+    label_formatter = points_formatter
   } else {
     stop("invalid metric")
   }
@@ -138,8 +138,7 @@ generate_hex_chart = function(hex_data, use_short_three = FALSE, metric = "bound
                  aes_string(x = "adj_x", y = "adj_y", group = "hexbin_id",
                             fill = metric, alpha = "hex_attempts"),
                  size = 0) +
-         scale_fill_gradientn(paste0(fill_label, "   "),
-                              colors = viridis_colors,
+         scale_fill_viridis_c(paste0(fill_label, "   "),
                               limit = fill_limit,
                               labels = label_formatter,
                               guide = guide_colorbar(barwidth = 15)) +

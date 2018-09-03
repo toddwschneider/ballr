@@ -102,10 +102,8 @@ short_three_line = data_frame(
 court_without_three = bind_rows(court_points , foul_circle_top, foul_circle_bottom, hoop, restricted)
 
 court_points = bind_rows(court_without_three, three_point_line)
-court_points = mutate(court_points , dash = (desc == "foul_circle_bottom"))
 
 short_three_court_points = bind_rows(court_without_three, short_three_line)
-short_three_court_points = mutate(short_three_court_points , dash = (desc == "foul_circle_bottom"))
 
 court = ggplot() +
   geom_path(data = court_points,
