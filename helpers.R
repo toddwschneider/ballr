@@ -21,4 +21,4 @@ points_formatter = function(x) {
   scales::comma(x, accuracy = 0.01)
 }
 
-bg_color = '#000004'
+short_three_seasons = c("1994-95", "1995-96", "1996-97")

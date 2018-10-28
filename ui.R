@@ -6,6 +6,7 @@ library(httr)
 library(jsonlite)
 
 source("helpers.R")
+source("court_themes.R")
 source("plot_court.R")
 source("players_data.R")
 source("fetch_shots.R")
@@ -28,6 +29,7 @@ shinyUI(
       tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"),
       tags$script(src = "shared/selectize/js/selectize.min.js"),
       tags$script(src = "ballr.js"),
+      uiOutput("shot_chart_css"),
       includeScript("www/google-analytics.js")
     ),
 
@@ -59,7 +61,7 @@ shinyUI(
             h4(textOutput("chart_header_team"))
           ),
 
-          plotOutput("court", height = "auto"),
+          plotOutput("court", width = 800, height = "auto"),
 
           uiOutput("shot_filters_applied"),
 
@@ -99,6 +101,11 @@ shinyUI(
                          label = "Date range",
                          start = FALSE,
                          end = FALSE),
+
+          radioButtons(inputId = "court_theme",
+                       label = "Theme",
+                       choices = c("Light", "Dark"),
+                       selected = "Light"),
 
           radioButtons(inputId = "chart_type",
                        label = "Chart Type",
