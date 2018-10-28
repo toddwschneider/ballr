@@ -19,7 +19,7 @@ runGitHub("ballr", "toddwschneider")
 
 ## Screenshot
 
-[![ballr](https://cloud.githubusercontent.com/assets/70271/13547819/b74dca58-e2ae-11e5-8f00-7c3c768e77e3.png)](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+[![ballr](https://user-images.githubusercontent.com/70271/47622113-71fc8b00-dad7-11e8-967d-50e54d1ed70a.png)](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
 
 There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**
 
@@ -39,7 +39,7 @@ Note that the color metrics are not plotted at the individual hexagon level, but
 
 Scatter charts are the most straightforward option: they show the location of each individual shot, with color-coding for makes and misses
 
-![scatter](https://cloud.githubusercontent.com/assets/70271/13382173/dfae7f46-de3b-11e5-9ca6-1e2740904b60.png)
+![scatter](https://user-images.githubusercontent.com/70271/47622144-d4558b80-dad7-11e8-9bc5-576632af3d53.png)
 
 ### Heat map
 
@@ -52,6 +52,10 @@ Anecdotally I've found that heat maps often show, unsurprisingly, that most shot
 ### Filters
 
 BallR lets you filter shots along a few dimensions (zone, angle, distance, made/missed) by adjusting the inputs in the sidebar. When you apply filters, the shot chart and summary stats update automatically to reflect whatever subset of shots you have chosen.
+
+### Color themes
+
+BallR comes with light and dark color themes, and you can define your own theme in `court_themes.R`
 
 ### Data
 
