@@ -1,5 +1,6 @@
 lebron = find_player_by_name("LeBron James")
 seasons = season_strings[as.character(2003:2015)]
+court_theme = court_themes$dark
 
 all_shots = bind_rows(lapply(seasons, function(season) {
   fetch_shots_by_player_id_and_season(lebron$person_id, season)$player %>%
@@ -44,8 +45,8 @@ ggplot(data = area, aes(x = season, y = frac, color = simplified_area)) +
     text = element_text(color = "#f0f0f0"),
     panel.grid.major = element_line(size = 0.25, color = "#555555"),
     panel.grid.minor = element_line(size = 0.25, color = "#555555"),
-    plot.background = element_rect(fill = bg_color, color = bg_color),
-    panel.background = element_rect(fill = bg_color, color = bg_color)
+    plot.background = element_rect(fill = court_theme$court, color = court_theme$court),
+    panel.background = element_rect(fill = court_theme$court, color = court_theme$court)
   )
 
 dist_fgp = all_shots %>%
@@ -75,6 +76,6 @@ ggplot(data = dist_fgp, aes(x = dist, y = fgp, color = group)) +
     text = element_text(color = "#f0f0f0"),
     panel.grid.major = element_line(size = 0.25, color = "#555555"),
     panel.grid.minor = element_line(size = 0.25, color = "#555555"),
-    plot.background = element_rect(fill = bg_color, color = bg_color),
-    panel.background = element_rect(fill = bg_color, color = bg_color)
+    plot.background = element_rect(fill = court_theme$court, color = court_theme$court),
+    panel.background = element_rect(fill = court_theme$court, color = court_theme$court)
   )

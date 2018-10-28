@@ -24,6 +24,21 @@ shinyServer(function(input, output, session) {
     input$season_type
   })
 
+  use_short_three = reactive({
+    req(current_season())
+    current_season() %in% short_three_seasons
+  })
+
+  court_theme = reactive({
+    req(input$court_theme)
+    court_themes[[tolower(input$court_theme)]]
+  })
+
+  court_plot = reactive({
+    req(court_theme())
+    plot_court(court_theme = court_theme(), use_short_three = use_short_three())
+  })
+
   update_season_input = observe({
     req(current_player(), current_player_seasons())
 
@@ -137,7 +152,7 @@ shinyServer(function(input, output, session) {
                 "Dot size",
                 min = 1,
                 max = 10,
-                value = 2.5,
+                value = 4,
                 step = 0.5)
   })
 
@@ -145,17 +160,22 @@ shinyServer(function(input, output, session) {
     req(input$chart_type == "Scatter")
 
     sliderInput("scatter_alpha",
-                "Transparency",
+                "Opacity",
                 min = 0.01,
                 max = 1,
-                value = 0.8,
+                value = 0.7,
                 step = 0.01)
   })
 
   shot_chart = reactive({
-    req(filtered_shots(), current_player(), current_season(), input$chart_type)
+    req(
+      filtered_shots(),
+      current_player(),
+      current_season(),
+      input$chart_type,
+      court_plot()
+    )
 
-    short_three = current_season() %in% short_three_seasons
     filters_applied()
 
     if (input$chart_type == "Hexagonal") {
@@ -163,8 +183,9 @@ shinyServer(function(input, output, session) {
 
       generate_hex_chart(
         hex_data = hexbin_data(),
-        use_short_three = short_three,
-        metric = input$hex_metric,
+        base_court = court_plot(),
+        court_theme = court_theme(),
+        metric = sym(input$hex_metric),
         alpha_range = alpha_range()
       )
     } else if (input$chart_type == "Scatter") {
@@ -172,15 +193,30 @@ shinyServer(function(input, output, session) {
 
       generate_scatter_chart(
         filtered_shots(),
+        base_court = court_plot(),
+        court_theme = court_theme(),
         alpha = input$scatter_alpha,
-        size = input$scatter_size,
-        use_short_three = short_three
+        size = input$scatter_size
       )
     } else if (input$chart_type == "Heat Map") {
-      generate_heatmap_chart(filtered_shots(), use_short_three = short_three)
+      generate_heatmap_chart(
+        filtered_shots(),
+        base_court = court_plot(),
+        court_theme = court_theme()
+      )
     } else {
       stop("invalid chart type")
     }
+  })
+
+  output$shot_chart_css = renderUI({
+    req(court_theme())
+    tags$style(paste0(
+      ".shot-chart-container {",
+        "background-color: ", court_theme()$court, "; ",
+        "color: ", court_theme()$text,
+      "}"
+    ))
   })
 
   output$chart_header_player = renderText({
@@ -238,7 +274,7 @@ shinyServer(function(input, output, session) {
     withProgress({
       shot_chart()
     }, message = "Calculating...")
-  }, height = 600, width = 800, bg = bg_color)
+  }, height = 600, width = 800, bg = "transparent")
 
   filters_applied = reactive({
     req(filtered_shots())
