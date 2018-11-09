@@ -75,7 +75,8 @@ fetch_shots_by_player_id = function(player_id, bigquery_project_id) {
       month(timestamp) <= 4 ~ year(timestamp) - 1,
       TRUE ~ year(timestamp)
     ),
-    season = paste(year, substr(year + 1, 3, 4), sep = "-")
+    season = paste(year, substr(year + 1, 3, 4), sep = "-"),
+    game_date = as.Date(timestamp)
   )
 
   return(shots)

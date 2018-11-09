@@ -33,6 +33,10 @@ Team-level prototype (not available in app yet):
 
 ![villanova shot chart](https://i.imgur.com/eGW4NS9.png)
 
+### Color themes
+
+BallR comes with light and dark color themes, and you can define your own theme in `court_themes.R`
+
 ## Questions/issues/contact
 
 todd@toddwschneider.com, or open a GitHub issue
