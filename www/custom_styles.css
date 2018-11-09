@@ -1,16 +1,20 @@
 #court {
-  padding-bottom: 10px;
-  text-align: center;
+  max-width: 100%;
+  margin: 0 auto;
 }
 #court img {
   max-width: 100%;
   height: auto;
   margin-bottom: 20px;
 }
+#court_theme .radio {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+#court_theme .shiny-options-group { display: inline-block; }
 .shot-chart-container {
-  background-color: #000004;
-  color: #fff;
   position: relative;
+  padding-bottom: 1em;
 }
 .shot-filters {
   max-width: 60%;

@@ -54,7 +54,7 @@ calculate_hex_coords = function(shots, binwidths) {
   hex_centers = hcell2xy(hb)
 
   hexbin_coords = bind_rows(lapply(1:hb@ncells, function(i) {
-    data.frame(
+    data_frame(
       x = origin_coords$x + hex_centers$x[i],
       y = origin_coords$y + hex_centers$y[i],
       center_x = hex_centers$x[i],
@@ -100,33 +100,42 @@ calculate_hexbins_from_shots = function(shots, binwidths = c(1, 1), min_radius_f
   list(hex_data = hex_data, fg_pct_limits = fg_pct_limits, pps_limits = pps_limits)
 }
 
-generate_hex_chart = function(hex_data, metric = "bounded_fg_diff", alpha_range = c(0.85, 0.98)) {
+generate_hex_chart = function(hex_data, base_court, court_theme = court_themes$dark, metric = sym(bounded_fg_diff), alpha_range = c(0.85, 0.98)) {
   if (length(hex_data) == 0) {
-    return(court)
+    return(base_court)
   }
 
   if (metric == "bounded_fg_pct") {
     fill_limit = hex_data$fg_pct_limits
     fill_label = "FG%"
-    label_formatter = scales::percent
+    label_formatter = percent_formatter
   } else if (metric == "bounded_points_per_shot") {
     fill_limit = hex_data$pps_limits
     fill_label = "Points Per Shot"
-    label_formatter = scales::comma
+    label_formatter = points_formatter
   } else {
     stop("invalid metric")
   }
 
-  court +
-    geom_polygon(data = hex_data$hex_data,
-                 aes_string(x = "adj_x", y = "adj_y", group = "hexbin_id",
-                            fill = metric, alpha = "hex_attempts"),
-                 size = 0) +
-         scale_fill_gradientn(paste0(fill_label, "   "),
-                              colors = viridis_colors,
-                              limit = fill_limit,
-                              labels = label_formatter,
-                              guide = guide_colorbar(barwidth = 15)) +
-         scale_alpha_continuous(guide = FALSE, range = alpha_range, trans = "sqrt") +
-         theme(legend.text = element_text(size = rel(0.6)))
+  base_court +
+    geom_polygon(
+      data = hex_data$hex_data,
+      aes(
+        x = adj_x,
+        y = adj_y,
+        group = hexbin_id,
+        fill = !!metric,
+        alpha = hex_attempts
+      ),
+      size = court_theme$hex_border_size,
+      color = court_theme$hex_border_color
+    ) +
+    scale_fill_viridis_c(
+      paste0(fill_label, "   "),
+      limit = fill_limit,
+      labels = label_formatter,
+      guide = guide_colorbar(barwidth = 15)
+    ) +
+    scale_alpha_continuous(guide = FALSE, range = alpha_range, trans = "sqrt") +
+    theme(legend.text = element_text(size = rel(0.6)))
 }

@@ -42,6 +42,16 @@ shinyServer(function(input, output, session) {
     shots()$season %>% unique() %>% sort()
   })
 
+  court_theme = reactive({
+    req(input$court_theme)
+    court_themes[[tolower(input$court_theme)]]
+  })
+
+  court_plot = reactive({
+    req(court_theme())
+    plot_court(court_theme = court_theme())
+  })
+
   current_seasons = reactive({
     if (is.null(input$season_filter)) {
       current_player_seasons()
@@ -71,7 +81,9 @@ shinyServer(function(input, output, session) {
       is.null(input$shot_zone_basic_filter) | shot_zone_basic %in% input$shot_zone_basic_filter,
       is.null(input$shot_zone_angle_filter) | shot_zone_area %in% input$shot_zone_angle_filter,
       is.null(input$shot_distance_filter) | shot_zone_range %in% input$shot_distance_filter,
-      is.null(input$season_filter) | season %in% input$season_filter
+      is.null(input$season_filter) | season %in% input$season_filter,
+      is.na(input$date_range[1]) | game_date >= input$date_range[1],
+      is.na(input$date_range[2]) | game_date <= input$date_range[2]
     )
   })
 
@@ -128,8 +140,30 @@ shinyServer(function(input, output, session) {
                 selectize = FALSE)
   })
 
+  output$scatter_size_slider = renderUI({
+    req(input$chart_type == "Scatter")
+
+    sliderInput("scatter_size",
+                "Dot size",
+                min = 1,
+                max = 10,
+                value = 4,
+                step = 0.5)
+  })
+
+  output$scatter_alpha_slider = renderUI({
+    req(input$chart_type == "Scatter")
+
+    sliderInput("scatter_alpha",
+                "Opacity",
+                min = 0.01,
+                max = 1,
+                value = 0.7,
+                step = 0.01)
+  })
+
   shot_chart = reactive({
-    req(filtered_shots(), current_player(), input$chart_type)
+    req(filtered_shots(), current_player(), input$chart_type, court_plot())
 
     filters_applied()
 
@@ -138,16 +172,40 @@ shinyServer(function(input, output, session) {
 
       generate_hex_chart(
         hex_data = hexbin_data(),
-        metric = input$hex_metric,
+        base_court = court_plot(),
+        court_theme = court_theme(),
+        metric = sym(input$hex_metric),
         alpha_range = alpha_range()
       )
     } else if (input$chart_type == "Scatter") {
-      generate_scatter_chart(filtered_shots())
+      req(input$scatter_alpha, input$scatter_size)
+
+      generate_scatter_chart(
+        filtered_shots(),
+        base_court = court_plot(),
+        court_theme = court_theme(),
+        alpha = input$scatter_alpha,
+        size = input$scatter_size
+      )
     } else if (input$chart_type == "Heat Map") {
-      generate_heatmap_chart(filtered_shots())
+      generate_heatmap_chart(
+        filtered_shots(),
+        base_court = court_plot(),
+        court_theme = court_theme()
+      )
     } else {
       stop("invalid chart type")
     }
+  })
+
+  output$shot_chart_css = renderUI({
+    req(court_theme())
+    tags$style(paste0(
+      ".shot-chart-container {",
+        "background-color: ", court_theme()$court, "; ",
+        "color: ", court_theme()$text,
+      "}"
+    ))
   })
 
   output$chart_header_player = renderText({
@@ -196,7 +254,7 @@ shinyServer(function(input, output, session) {
     withProgress({
       shot_chart()
     }, message = "Calculating...")
-  }, height = 600, width = 800, bg = bg_color)
+  }, height = 600, width = 800, bg = "transparent")
 
   filters_applied = reactive({
     req(filtered_shots())
@@ -216,6 +274,13 @@ shinyServer(function(input, output, session) {
 
     if (input$shot_result_filter != "all") {
       filters[["Result"]] = paste("Result:", input$shot_result_filter)
+    }
+
+    if (!is.na(input$date_range[1]) | !is.na(input$date_range[2])) {
+      dates = format(input$date_range, "%m/%d/%y")
+      dates[is.na(dates)] = ""
+
+      filters[["Dates"]] = paste("Dates:", paste(dates, collapse = "–"))
     }
 
     filters

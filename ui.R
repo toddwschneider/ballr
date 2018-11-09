@@ -9,6 +9,7 @@ library(lubridate)
 options("httr_oob_default" = TRUE)
 
 source("helpers.R")
+source("court_themes.R")
 source("plot_court.R")
 source("players_data.R")
 source("fetch_shots.R")
@@ -31,6 +32,7 @@ shinyUI(
       tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"),
       tags$script(src = "shared/selectize/js/selectize.min.js"),
       tags$script(src = "ballr.js"),
+      uiOutput("shot_chart_css"),
       includeScript("www/google-analytics.js")
     ),
 
@@ -64,7 +66,7 @@ shinyUI(
             h4(textOutput("chart_header_info"))
           ),
 
-          plotOutput("court", height = "auto"),
+          plotOutput("court", width = 800, height = "auto"),
 
           uiOutput("shot_filters_applied"),
 
@@ -93,6 +95,16 @@ shinyUI(
                           onDropdownOpen = I("function() { this.clear('silent'); }")
                         )),
 
+          dateRangeInput(inputId = "date_range",
+                         label = "Date range",
+                         start = FALSE,
+                         end = FALSE),
+
+          radioButtons(inputId = "court_theme",
+                       label = "Theme",
+                       choices = c("Light", "Dark"),
+                       selected = "Light"),
+
           radioButtons(inputId = "chart_type",
                        label = "Chart Type",
                        choices = c("Hexagonal", "Scatter", "Heat Map"),
@@ -101,6 +113,9 @@ shinyUI(
           uiOutput("hex_metric_buttons"),
           uiOutput("hexbinwidth_slider"),
           uiOutput("hex_radius_slider"),
+
+          uiOutput("scatter_size_slider"),
+          uiOutput("scatter_alpha_slider"),
 
           h4("Filters"),
 
