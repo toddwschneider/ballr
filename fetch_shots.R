@@ -1,5 +1,17 @@
 fetch_shots_by_player_id = function(player_id, bigquery_project_id) {
-  req(player_id, bigquery_project_id)
+  fetch_shots("player_id", player_id, bigquery_project_id)
+}
+
+fetch_shots_by_team_id = function(team_id, bigquery_project_id) {
+  fetch_shots("team_id", team_id, bigquery_project_id)
+}
+
+fetch_shots = function(column_name, column_value, bigquery_project_id) {
+  req(column_name, column_value, bigquery_project_id)
+
+  if (!(column_name %in% c("player_id", "team_id"))) {
+    stop("invalid column_name")
+  }
 
   shots_sql = paste0("
     SELECT
@@ -22,7 +34,7 @@ fetch_shots_by_player_id = function(player_id, bigquery_project_id) {
     WHERE type = 'fieldgoal'
       AND event_coord_x IS NOT NULL
       AND event_coord_y IS NOT NULL
-      AND player_id = '", player_id, "'
+      AND ", column_name, " = '", column_value, "'
   ")
 
   shots_raw = query_exec(shots_sql, bigquery_project_id) %>%

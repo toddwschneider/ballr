@@ -6,16 +6,16 @@ You'll need to set up a Google BigQuery project in order to use College BallR. N
 
 ## Notes
 
-College BallR was hacked together fairly quickly from NBA BallR and should be considered experimental.
+College BallR supports shot charts by player and by team. It was hacked together fairly quickly from NBA BallR and should be considered experimental.
 
-The Sportradar BigQuery API is considerably more flexible than the NBA Stats API, which means that with more work, College BallR should be able to support shot charts by team, conference, mascot name, and many other dimensions. For now though it only supports shot charts by player.
+The Sportradar BigQuery API is considerably more flexible than the NBA Stats API, which is why College BallR supports team-level charts while the NBA version does not. With a bit more work, College BallR could support shot charts by conference, tournament, mascot name, and many other dimensions.
 
 ## Run your own local version
 
 You can run College BallR on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
 
 ```R
-packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite", "bigrquery", "lubridate")
+packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite", "bigrquery", "lubridate", "readr")
 install.packages(packages, repos = "https://cran.rstudio.com/")
 library(shiny)
 runGitHub("ballr", "toddwschneider", ref = "college")
@@ -27,11 +27,11 @@ Enter your BigQuery credentials at the top of the sidebar. If it's your first ti
 
 There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**. Read more about them on [the NBA version's README page](https://github.com/toddwschneider/ballr).
 
-![college ballr](https://i.imgur.com/sHBQpPJ.png)
+![trae young college ballr](https://user-images.githubusercontent.com/70271/48303826-91cf7e00-e4dd-11e8-818e-001cbc2840f7.png)
 
-Team-level prototype (not available in app yet):
+Team-level:
 
-![villanova shot chart](https://i.imgur.com/eGW4NS9.png)
+![villanova shot chart](https://user-images.githubusercontent.com/70271/48303832-9d22a980-e4dd-11e8-8b1d-70c58cb8a5fc.png)
 
 ### Color themes
 

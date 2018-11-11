@@ -7,11 +7,13 @@
   height: auto;
   margin-bottom: 20px;
 }
-#court_theme .radio {
+#court_theme .radio, #view_shots_by .radio {
   display: inline-block;
   padding-left: 0.5em;
 }
-#court_theme .shiny-options-group { display: inline-block; }
+#court_theme .shiny-options-group, #view_shots_by .shiny-options-group {
+  display: inline-block;
+}
 .shot-chart-container {
   position: relative;
   padding-bottom: 1em;
