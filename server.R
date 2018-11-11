@@ -11,33 +11,73 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  players = reactive({
+  players_and_teams = reactive({
     req(bigquery_project_id())
 
     withProgress({
-      fetch_all_players(bigquery_project_id())
+      fetch_all_players_and_teams(bigquery_project_id())
     }, message = "Fetching players data...")
   })
 
-  update_players_input = observe({
-    req(players())
+  players = reactive({
+    req(players_and_teams())
+    players_and_teams()$players
+  })
 
-    current_selection = input$player_name
+  teams = reactive({
+    req(players_and_teams())
+    players_and_teams()$teams
+  })
 
-    updateSelectInput(
-      session,
-      "player_name",
-      choices = c("Enter a player..." = "", players()$name),
-      selected = current_selection
-    )
+  output$shots_select_input = renderUI({
+    req(input$view_shots_by, players(), teams())
+
+    if (input$view_shots_by == "Player") {
+      input_id = "player_name"
+      label = "Player"
+      choices = c("Enter a player..." = "", players()$name)
+      selected = ifelse(is.null(input$player_name), default_player_name, input$player_name)
+    } else if (input$view_shots_by == "Team") {
+      input_id = "team_name"
+      label = "Team"
+      choices = c("Enter a team..." = "", teams()$name)
+      selected = ifelse(is.null(input$team_name), "", input$team_name)
+    }
+
+    selectizeInput(inputId = input_id,
+                   label = label,
+                   choices = choices,
+                   selected = selected,
+                   options = list(
+                     selectOnTab = TRUE,
+                     maxOptions = 20000,
+                     onDropdownOpen = I("function() { this.clear('silent'); }")
+                   ))
   })
 
   current_player = reactive({
-    req(bigquery_project_id(), input$player_name)
+    req(bigquery_project_id(), input$player_name, input$view_shots_by == "Player")
     filter(players(), lower_name == tolower(input$player_name))
   })
 
-  current_player_seasons = reactive({
+  current_team = reactive({
+    req(bigquery_project_id(), input$team_name, input$view_shots_by == "Team")
+    filter(teams(), lower_name == tolower(input$team_name))
+  })
+
+  current_selection = reactive({
+    req(bigquery_project_id(), input$view_shots_by)
+
+    if (input$view_shots_by == "Player") {
+      req(current_player())
+      current_player()
+    } else if (input$view_shots_by == "Team") {
+      req(current_team())
+      current_team()
+    }
+  })
+
+  current_selection_seasons = reactive({
     req(shots())
     shots()$season %>% unique() %>% sort()
   })
@@ -54,7 +94,7 @@ shinyServer(function(input, output, session) {
 
   current_seasons = reactive({
     if (is.null(input$season_filter)) {
-      current_player_seasons()
+      current_selection_seasons()
     } else {
       input$season_filter
     }
@@ -63,13 +103,20 @@ shinyServer(function(input, output, session) {
   update_season_input = observe({
     updateSelectInput(session,
                       "season_filter",
-                      choices = rev(current_player_seasons()),
+                      choices = rev(current_selection_seasons()),
                       selected = NULL)
   })
 
   shots = reactive({
-    req(current_player(), bigquery_project_id())
-    fetch_shots_by_player_id(current_player()$player_id, bigquery_project_id())
+    req(bigquery_project_id(), input$view_shots_by)
+
+    if (input$view_shots_by == "Player") {
+      req(current_player())
+      fetch_shots_by_player_id(current_player()$player_id, bigquery_project_id())
+    } else if (input$view_shots_by == "Team") {
+      req(current_team())
+      fetch_shots_by_team_id(current_team()$team_id, bigquery_project_id())
+    }
   })
 
   filtered_shots = reactive({
@@ -163,7 +210,7 @@ shinyServer(function(input, output, session) {
   })
 
   shot_chart = reactive({
-    req(filtered_shots(), current_player(), input$chart_type, court_plot())
+    req(filtered_shots(), input$chart_type, court_plot())
 
     filters_applied()
 
@@ -208,9 +255,9 @@ shinyServer(function(input, output, session) {
     ))
   })
 
-  output$chart_header_player = renderText({
-    req(current_player())
-    current_player()$name
+  output$chart_header = renderText({
+    req(current_selection())
+    current_selection()$name
   })
 
   output$chart_header_info = renderText({
@@ -218,8 +265,8 @@ shinyServer(function(input, output, session) {
     paste(current_seasons(), collapse = ", ")
   })
 
-  output$chart_header_team = renderText({
-    req(shots())
+  output$chart_header_player_team = renderText({
+    req(shots(), current_player(), input$view_shots_by == "Player")
     current_player()$team
   })
 
@@ -234,10 +281,10 @@ shinyServer(function(input, output, session) {
   })
 
   output$download_link = renderUI({
-    req(shot_chart())
+    req(shot_chart(), current_selection())
 
     filename_parts = c(
-      current_player()$name,
+      current_selection()$name,
       "Shot Chart",
       input$chart_type
     )
@@ -298,8 +345,8 @@ shinyServer(function(input, output, session) {
   })
 
   output$summary_stats_header = renderText({
-    req(current_player())
-    paste(current_player()$name, "Summary Stats")
+    req(current_selection())
+    paste(current_selection()$name, "Summary Stats")
   })
 
   output$summary_stats = renderUI({

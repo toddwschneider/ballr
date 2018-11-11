@@ -61,8 +61,8 @@ shinyUI(
 
         div(class = "shot-chart-container",
           div(class = "shot-chart-header",
-            h2(textOutput("chart_header_player")),
-            h4(textOutput("chart_header_team")),
+            h2(textOutput("chart_header")),
+            h4(textOutput("chart_header_player_team")),
             h4(textOutput("chart_header_info"))
           ),
 
@@ -85,15 +85,12 @@ shinyUI(
         div(class = "shot-chart-inputs",
           textInput("bigquery_project_id", "BigQuery Project Name or ID"),
 
-          selectizeInput(inputId = "player_name",
-                        label = "Player",
-                        choices = c("Enter a player..." = "", default_player_name),
-                        selected = default_player_name,
-                        options = list(
-                          selectOnTab = TRUE,
-                          maxOptions = 20000,
-                          onDropdownOpen = I("function() { this.clear('silent'); }")
-                        )),
+          radioButtons(inputId = "view_shots_by",
+                       label = "View by",
+                       choices = c("Player", "Team"),
+                       selected = "Player"),
+
+          uiOutput("shots_select_input"),
 
           dateRangeInput(inputId = "date_range",
                          label = "Date range",
