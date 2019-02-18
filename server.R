@@ -263,7 +263,7 @@ shinyServer(function(input, output, session) {
 
   output$player_photo = renderUI({
     if (input$player_name == "") {
-      tags$img(src = "http://i.imgur.com/hXWPTOF.png", alt = "photo")
+      tags$img(src = "https://i.imgur.com/hXWPTOF.png", alt = "photo")
     } else if (req(current_player()$person_id)) {
       tags$img(src = player_photo_url(current_player()$person_id), alt = "photo")
     }

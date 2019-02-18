@@ -2,7 +2,7 @@ fetch_shots_by_player_id_and_season = function(player_id, season, season_type = 
   req(player_id, season, season_type)
 
   request = GET(
-    "http://stats.nba.com/stats/shotchartdetail",
+    "https://stats.nba.com/stats/shotchartdetail",
     query = list(
       PlayerID = player_id,
       Season = season,

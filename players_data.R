@@ -1,4 +1,4 @@
-players_url = "http://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2015-16&IsOnlyCurrentSeason=0"
+players_url = "https://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2015-16&IsOnlyCurrentSeason=0"
 
 request_headers = c(
   "accept-encoding" = "gzip, deflate, sdch",
@@ -71,5 +71,5 @@ default_season = rev(default_seasons)[default_season_ix]
 default_season_type = "Regular Season"
 
 player_photo_url = function(player_id) {
-  paste0("http://stats.nba.com/media/players/230x185/", player_id, ".png")
+  paste0("https://stats.nba.com/media/players/230x185/", player_id, ".png")
 }

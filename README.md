@@ -1,8 +1,8 @@
 # BallR: Interactive NBA Shot Charts with R and Shiny
 
-[BallR](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/) uses the [NBA Stats API](http://stats.nba.com/) to visualize every shot taken by a player during an NBA season dating back to 1996.
+[BallR](https://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/) uses the [NBA Stats API](https://stats.nba.com/) to visualize every shot taken by a player during an NBA season dating back to 1996.
 
-[See this post for more info](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+[See this post for more info](https://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
 
 See also [the college branch of this repo](https://github.com/toddwschneider/ballr/tree/college) for men's college basketball shot charts.
 
@@ -19,7 +19,7 @@ runGitHub("ballr", "toddwschneider")
 
 ## Screenshot
 
-[![ballr](https://user-images.githubusercontent.com/70271/47622113-71fc8b00-dad7-11e8-967d-50e54d1ed70a.png)](http://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
+[![ballr](https://user-images.githubusercontent.com/70271/47622113-71fc8b00-dad7-11e8-967d-50e54d1ed70a.png)](https://toddwschneider.com/posts/ballr-interactive-nba-shot-charts-with-r-and-shiny/)
 
 There are three chart types to choose from: **hexagonal**, **scatter**, and **heat map**
 
@@ -71,7 +71,7 @@ BallR does not interact with NBA Shots DB yet, but that might change in the futu
 
 ### Acknowledgments
 
-Posts by [Savvas Tjortjoglou](http://savvastjortjoglou.com/nba-shot-sharts.html) and [Eduardo Maia](http://thedatagame.com.au/2015/09/27/how-to-create-nba-shot-charts-in-r/) about making NBA shot charts in Python and R, respectively, served as useful resources
+Posts by [Savvas Tjortjoglou](http://savvastjortjoglou.com/nba-shot-sharts.html) and [Eduardo Maia](https://thedatagame.com.au/2015/09/27/how-to-create-nba-shot-charts-in-r/) about making NBA shot charts in Python and R, respectively, served as useful resources
 
 ## Questions/issues/contact
 
