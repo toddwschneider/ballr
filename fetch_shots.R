@@ -51,7 +51,7 @@ fetch_shots_by_player_id_and_season = function(player_id, season, season_type = 
     )
   }
 
-  shots = tbl_df(shots)
+  shots = as_tibble(shots)
   names(shots) = col_names
 
   shots = mutate(shots,

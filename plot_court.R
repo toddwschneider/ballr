@@ -1,6 +1,6 @@
 circle_points = function(center = c(0, 0), radius = 1, npoints = 360) {
   angles = seq(0, 2 * pi, length.out = npoints)
-  return(data_frame(x = center[1] + radius * cos(angles),
+  return(tibble(x = center[1] + radius * cos(angles),
                     y = center[2] + radius * sin(angles)))
 }
 
@@ -24,25 +24,25 @@ plot_court = function(court_theme = court_themes$dark, use_short_three = FALSE) 
     three_point_side_height = 0
   }
 
-  court_points = data_frame(
+  court_points = tibble(
     x = c(width / 2, width / 2, -width / 2, -width / 2, width / 2),
     y = c(height, 0, 0, height, height),
     desc = "perimeter"
   )
 
-  court_points = bind_rows(court_points , data_frame(
+  court_points = bind_rows(court_points , tibble(
     x = c(outer_key_width / 2, outer_key_width / 2, -outer_key_width / 2, -outer_key_width / 2),
     y = c(0, key_height, key_height, 0),
     desc = "outer_key"
   ))
 
-  court_points = bind_rows(court_points , data_frame(
+  court_points = bind_rows(court_points , tibble(
     x = c(-backboard_width / 2, backboard_width / 2),
     y = c(backboard_offset, backboard_offset),
     desc = "backboard"
   ))
 
-  court_points = bind_rows(court_points , data_frame(
+  court_points = bind_rows(court_points , tibble(
     x = c(0, 0), y = c(backboard_offset, backboard_offset + neck_length), desc = "neck"
   ))
 
@@ -70,7 +70,7 @@ plot_court = function(court_theme = court_themes$dark, use_short_three = FALSE) 
   three_point_circle = circle_points(center = c(0, hoop_center_y), radius = three_point_radius) %>%
     filter(y >= three_point_side_height, y >= hoop_center_y)
 
-  three_point_line = data_frame(
+  three_point_line = tibble(
     x = c(three_point_side_radius, three_point_side_radius, three_point_circle$x, -three_point_side_radius, -three_point_side_radius),
     y = c(0, three_point_side_height, three_point_circle$y, three_point_side_height, 0),
     desc = "three_point_line"
