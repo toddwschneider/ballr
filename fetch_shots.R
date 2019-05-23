@@ -51,11 +51,11 @@ fetch_shots_by_player_id_and_season = function(player_id, season, season_type = 
     )
   }
 
-  shots = tbl_df(shots)
+  shots = as_tibble(shots)
   names(shots) = col_names
 
   shots = mutate(shots,
-    loc_x = as.numeric(as.character(loc_x)) / 10,
+    loc_x = -as.numeric(as.character(loc_x)) / 10,
     loc_y = as.numeric(as.character(loc_y)) / 10 + hoop_center_y,
     shot_distance = as.numeric(as.character(shot_distance)),
     shot_made_numeric = as.numeric(as.character(shot_made_flag)),

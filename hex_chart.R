@@ -54,7 +54,7 @@ calculate_hex_coords = function(shots, binwidths) {
   hex_centers = hcell2xy(hb)
 
   hexbin_coords = bind_rows(lapply(1:hb@ncells, function(i) {
-    data_frame(
+    tibble(
       x = origin_coords$x + hex_centers$x[i],
       y = origin_coords$y + hex_centers$y[i],
       center_x = hex_centers$x[i],
