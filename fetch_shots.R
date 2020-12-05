@@ -67,7 +67,7 @@ fetch_shots_by_player_id_and_season = function(player_id, season, season_type = 
 
   raw_league_avg_data = data$resultSets[[2]]$rowSet
   league_avg_names = tolower(as.character(data$resultSets[[2]]$headers))
-  league_averages = tbl_df(data.frame(
+  league_averages = as_tibble(data.frame(
     matrix(unlist(raw_league_avg_data), ncol = length(league_avg_names), byrow = TRUE)
   ))
   names(league_averages) = league_avg_names

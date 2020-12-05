@@ -332,7 +332,8 @@ shinyServer(function(input, output, session) {
                 fga = n(),
                 pct = mean(shot_made_numeric),
                 pct_as_text = fraction_to_percent_format(pct),
-                points_per_shot = mean(shot_value * shot_made_numeric)) %>%
+                points_per_shot = mean(shot_value * shot_made_numeric),
+                .groups = "drop") %>%
       arrange(desc(fga), desc(fgm))
 
     league_zone = shots()$league_averages %>%
@@ -341,7 +342,8 @@ shinyServer(function(input, output, session) {
                 lg_fga = sum(fga),
                 lg_pct = lg_fgm / lg_fga,
                 lg_pct_as_text = fraction_to_percent_format(lg_pct),
-                lg_points_per_shot = round(mean(shot_value * lg_pct), 2))
+                lg_points_per_shot = round(mean(shot_value * lg_pct), 2),
+                .groups = "drop")
 
     merged = inner_join(player_zone, league_zone, by = "shot_zone_basic")
 
@@ -353,7 +355,8 @@ shinyServer(function(input, output, session) {
       points_per_shot = sum(points_per_shot * fga) / sum(fga),
       lg_pct = sum(lg_fgm) / sum(lg_fga),
       lg_pct_as_text = fraction_to_percent_format(lg_pct),
-      lg_points_per_shot = sum(lg_points_per_shot * lg_fga) / sum(lg_fga)
+      lg_points_per_shot = sum(lg_points_per_shot * lg_fga) / sum(lg_fga),
+      .groups = "drop"
     )
 
     html = list(div(class = "row headers",
