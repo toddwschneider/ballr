@@ -30,13 +30,13 @@ calculate_hex_coords = function(shots, binwidths) {
       hex_attempts = n(),
       hex_pct = mean(shot_made_numeric),
       hex_points_scored = sum(shot_made_numeric * shot_value),
-      hex_points_per_shot = mean(shot_made_numeric * shot_value)
+      hex_points_per_shot = mean(shot_made_numeric * shot_value),
+      .groups = "drop"
     )
 
   hexbin_ids_to_zones = shots %>%
     group_by(hexbin_id, shot_zone_range, shot_zone_area) %>%
-    summarize(attempts = n()) %>%
-    ungroup() %>%
+    summarize(attempts = n(), .groups = "drop") %>%
     arrange(hexbin_id, desc(attempts)) %>%
     group_by(hexbin_id) %>%
     filter(row_number() == 1) %>%
@@ -78,12 +78,13 @@ calculate_hexbins_from_shots = function(shots, league_averages, binwidths = c(1,
       zone_attempts = n(),
       zone_pct = mean(shot_made_numeric),
       zone_points_scored = sum(shot_made_numeric * shot_value),
-      zone_points_per_shot = mean(shot_made_numeric * shot_value)
+      zone_points_per_shot = mean(shot_made_numeric * shot_value),
+      .groups = "drop"
     )
 
   league_zone_stats = league_averages %>%
     group_by(shot_zone_range, shot_zone_area) %>%
-    summarize(league_pct = sum(fgm) / sum(fga))
+    summarize(league_pct = sum(fgm) / sum(fga), .groups = "drop")
 
   hex_data = calculate_hex_coords(shots, binwidths = binwidths)
 

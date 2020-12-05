@@ -22,8 +22,7 @@ area = all_shots %>%
   filter(simplified_area != "Backcourt") %>%
   mutate(season = as.numeric(substr(season, 1, 4))) %>%
   group_by(season, simplified_area) %>%
-  summarize(attempts = n()) %>%
-  ungroup() %>%
+  summarize(attempts = n(), .groups = "drop") %>%
   group_by(season) %>%
   mutate(frac = attempts / sum(attempts))
 

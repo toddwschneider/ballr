@@ -1,21 +1,21 @@
-players_url = "https://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2015-16&IsOnlyCurrentSeason=0"
+players_url = "https://stats.nba.com/stats/commonallplayers?LeagueID=00&Season=2020-21&IsOnlyCurrentSeason=0"
 
 request_headers = c(
-  "accept-encoding" = "gzip, deflate, sdch",
-  "accept-language" = "en-US,en;q=0.8",
-  "cache-control" = "no-cache",
-  "connection" = "keep-alive",
-  "host" = "stats.nba.com",
-  "pragma" = "no-cache",
-  "referer" = "https://www.nba.com/",
-  "upgrade-insecure-requests" = "1",
-  "user-agent" = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
+  "Accept" = "application/json, text/plain, */*",
+  "Accept-Language" = "en-US,en;q=0.8",
+  "Cache-Control" = "no-cache",
+  "Connection" = "keep-alive",
+  "Host" = "stats.nba.com",
+  "Pragma" = "no-cache",
+  "Referer" = "https://www.nba.com/",
+  "Upgrade-Insecure-Requests" = "1",
+  "User-Agent" = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9"
 )
 
 request = GET(players_url, add_headers(request_headers))
 
 players_data = fromJSON(content(request, as = "text"))
-players = tbl_df(data.frame(players_data$resultSets$rowSet[[1]], stringsAsFactors = FALSE))
+players = as_tibble(data.frame(players_data$resultSets$rowSet[[1]], stringsAsFactors = FALSE))
 names(players) = tolower(players_data$resultSets$headers[[1]])
 
 players = mutate(players,
@@ -62,11 +62,11 @@ find_player_id_by_name = function(n) {
   find_player_by_name(n)$person_id
 }
 
-default_player = find_player_by_name("Stephen Curry")
+default_player = find_player_by_name("LeBron James")
 default_years = as.character(default_player$from_year:default_player$to_year)
 default_seasons = as.character(season_strings[default_years])
 
-default_season_ix = ifelse(as.numeric(format(Sys.Date(), "%m")) %in% 6:10, 2, 1)
+default_season_ix = ifelse(as.numeric(format(Sys.Date(), "%m")) %in% 6:12, 2, 1)
 default_season = rev(default_seasons)[default_season_ix]
 
 default_season_type = "Regular Season"
