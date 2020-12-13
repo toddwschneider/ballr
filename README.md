@@ -11,7 +11,7 @@ See also [the college branch of this repo](https://github.com/toddwschneider/bal
 You can run BallR on your own machine by pasting the following code into the R console (you'll have to [install R](https://cran.rstudio.com/) first):
 
 ```R
-packages = c("shiny", "ggplot2", "hexbin", "dplyr", "httr", "jsonlite")
+packages = c("shiny", "tidyverse", "hexbin")
 install.packages(packages, repos = "https://cran.rstudio.com/")
 library(shiny)
 runGitHub("ballr", "toddwschneider")

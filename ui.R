@@ -1,7 +1,6 @@
 library(shiny)
-library(ggplot2)
+library(tidyverse)
 library(hexbin)
-library(dplyr)
 library(httr)
 library(jsonlite)
 
