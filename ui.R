@@ -32,8 +32,7 @@ shinyUI(
       tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"),
       tags$script(src = "shared/selectize/js/selectize.min.js"),
       tags$script(src = "ballr.js"),
-      uiOutput("shot_chart_css"),
-      includeScript("www/google-analytics.js")
+      uiOutput("shot_chart_css")
     ),
 
     HTML('
